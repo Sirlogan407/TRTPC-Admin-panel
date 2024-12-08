@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRTPC Admin Panel</title>
+    <style>
+        body {
+            background-color: grey;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .form-container {
+            background: #333;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+        }
+        .form-container label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        .form-container input, .form-container select, .form-container button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+        .form-container button {
+            cursor: pointer;
+        }
+        .logs-container {
+            margin-top: 20px;
+            width: 300px;
+        }
+        .logs-container h2 {
+            margin-bottom: 10px;
+        }
+        .log {
+            background: #444;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h1>TRTPC Admin Panel</h1>
+    <div class="form-container">
+        <label for="reason">Reason</label>
+        <select id="reason">
+            <option value="Exploiting (ROBLOX TOS)">Exploiting (ROBLOX TOS)</option>
+            <option value="Online Dating (ROBLOX TOS)">Online Dating (ROBLOX TOS)</option>
+            <option value="Impersonating Staff">Impersonating Staff</option>
+            <option value="Changing GUI">Changing GUI</option>
+            <option value="Fired Staff">Fired Staff</option>
+        </select>
+
+        <label for="username">Username/UserID</label>
+        <input type="text" id="username" placeholder="Enter Username or UserID">
+
+        <label for="staff-member">Staff Member</label>
+        <input type="text" id="staff-member" placeholder="Enter Staff Member Name">
+
+        <div id="ban-options" style="display: none;">
+            <label for="ban-duration">Ban Duration (Months, Days, Hours)</label>
+            <input type="text" id="ban-duration" placeholder="e.g., 1 month, 10 days, 5 hours">
+        </div>
+
+        <button onclick="showBanOptions()">Ban</button>
+        <button id="submit-btn" onclick="submitLog()">Submit</button>
+    </div>
+
+    <div class="logs-container">
+        <h2>Logs</h2>
+        <div id="logs"></div>
+    </div>
+
+    <script>
+        const logsContainer = document.getElementById('logs');
+
+        // Load logs from localStorage on page load
+        window.onload = () => {
+            const logs = JSON.parse(localStorage.getItem('logs')) || [];
+            logs.forEach(log => displayLog(log));
+        };
+
+        function showBanOptions() {
+            document.getElementById('ban-options').style.display = 'block';
+        }
+
+        function submitLog() {
+            const reason = document.getElementById('reason').value;
+            const username = document.getElementById('username').value.trim();
+            const staff = document.getElementById('staff-member').value.trim();
+            const banOptions = document.getElementById('ban-options').style.display === 'block';
+            let banDuration = '';
+
+            if (banOptions) {
+                banDuration = document.getElementById('ban-duration').value.trim();
+            }
+
+            if (!username || !staff) {
+                alert('Please fill out all fields.');
+                return;
+            }
+
+            const log = `${new Date().toLocaleString()} - Reason: ${reason}, Username/UserID: ${username}, Staff: ${staff}${banDuration ? `, Duration: ${banDuration}` : ''}`;
+            
+            // Save log to localStorage
+            const logs = JSON.parse(localStorage.getItem('logs')) || [];
+            logs.push(log);
+            localStorage.setItem('logs', JSON.stringify(logs));
+
+            // Display log
+            displayLog(log);
+
+            // Reset fields after logging
+            document.getElementById('username').value = '';
+            document.getElementById('staff-member').value = '';
+            if (banOptions) {
+                document.getElementById('ban-duration').value = '';
+                document.getElementById('ban-options').style.display = 'none';
+            }
+        }
+
+        function displayLog(log) {
+            const logElement = document.createElement('div');
+            logElement.className = 'log';
+            logElement.textContent = log;
+            logsContainer.appendChild(logElement);
+        }
+    </script>
+</body>
+</html>
